@@ -16,6 +16,7 @@ export class MyfoxAPI {
   private tokenExpiresIn: Date;
   private debugPlayload: boolean;
   private debug: boolean;
+  private authTokenPromise: Promise<string> | null = null;
 
   constructor(
     public readonly log: Logger,
@@ -91,6 +92,10 @@ export class MyfoxAPI {
       return Promise.reject('[Configuration] missing client secret');
     }
 
+    if (this.authTokenPromise) {
+      return this.authTokenPromise;
+    }
+    
     if (this.tokenExpiresIn < new Date()) {
       //Current Auth token is expired
       //Get a new one using myfox API
@@ -103,7 +108,8 @@ export class MyfoxAPI {
       if (this.debug) {
         this.log.debug('[MyfoxAPI] getAuthtoken');
       }
-      return fetch(`${this.myfoxAPIUrl}/oauth2/token`, { method: method, headers: headers, body: body })
+      
+      this.authTokenPromise = fetch(`${this.myfoxAPIUrl}/oauth2/token`, { method: method, headers: headers, body: body })
         .then((res: Response) => this.checkHttpStatus('getAuthtoken', res))
         .then((res: Response) => this.getJSONPlayload(res))
         .then((json: any) => {
@@ -111,8 +117,12 @@ export class MyfoxAPI {
           this.config.myfoxAPI.refreshToken = json.refresh_token;
           this.tokenExpiresIn = new Date();
           this.tokenExpiresIn.setSeconds(+(this.tokenExpiresIn.getSeconds()) + json.expires_in);
+          return this.authToken;
         })
-        .then(() => this.authToken);
+        .finally(() => {
+          this.authTokenPromise = null;
+      });
+      return this.authTokenPromise;
     } else {
       // refresh not needed, return current auth token
       return new Promise((successCallback) => {
