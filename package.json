@@ -1,8 +1,8 @@
 {
   "private": false,
   "displayName": "Homebridge Myfox HC2 Plugin",
-  "name": "@nicohery/homebridge-myfoxhc2",
-  "version": "1.4.3",
+  "name": "@nico.hery/homebridge-myfoxhc2",
+  "version": "1.4.4",
   "description": "Interact with Myfox HC2 alarm.",
   "license": "ISC",
   "repository": {
@@ -47,5 +47,6 @@
     "typescript": "^3.8.3"
   },
   "homepage": "https://github.com/nicohery/homebridge-myfoxhc2#readme",
-  "author": "nicohery"
+  "author": "nicohery",
+  "types": "./dist/index.d.ts"
 }

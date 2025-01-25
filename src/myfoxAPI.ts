@@ -116,10 +116,10 @@ export class MyfoxAPI {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: new URLSearchParams({
-        grant_type: 'refresh_token',
-        client_id: this.config.myfoxAPI.clientId,
-        client_secret: this.config.myfoxAPI.clientSecret,
-        refresh_token: this.config.myfoxAPI.refreshToken,
+        'grant_type': 'refresh_token',
+        'client_id': this.config.myfoxAPI.clientId,
+        'client_secret': this.config.myfoxAPI.clientSecret,
+        'refresh_token': this.config.myfoxAPI.refreshToken,
       }),
     });
 
