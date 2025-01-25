@@ -9,6 +9,7 @@ import { TemperatureValue } from './model/myfox-api/temperature-value';
 import { TemperatureSensor } from './model/myfox-api/temperature-sensor';
 
 import isGroup from './helpers/group-handler';
+import { URLSearchParams } from 'url';
 
 export class MyfoxAPI {
   private readonly myfoxAPIUrl: string = 'https://api.myfox.me';
@@ -95,42 +96,44 @@ export class MyfoxAPI {
     if (this.authTokenPromise) {
       return this.authTokenPromise;
     }
-    
+
     if (this.tokenExpiresIn < new Date()) {
-      //Current Auth token is expired
-      //Get a new one using myfox API
-      const method = 'POST';
-      const headers = {
-        'Authorization': 'Basic ' + Buffer.from(this.config.myfoxAPI.clientId + ':' + this.config.myfoxAPI.clientSecret).toString('base64'),
-        'Content-Type': 'application/x-www-form-urlencoded',
-      };
-      const body = `grant_type=refresh_token&refresh_token=${this.config.myfoxAPI.refreshToken}`;
-      if (this.debug) {
-        this.log.debug('[MyfoxAPI] getAuthtoken');
-      }
-      
-      this.authTokenPromise = fetch(`${this.myfoxAPIUrl}/oauth2/token`, { method: method, headers: headers, body: body })
-        .then((res: Response) => this.checkHttpStatus('getAuthtoken', res))
-        .then((res: Response) => this.getJSONPlayload(res))
-        .then((json: any) => {
-          this.authToken = json.access_token;
-          this.config.myfoxAPI.refreshToken = json.refresh_token;
-          this.tokenExpiresIn = new Date();
-          this.tokenExpiresIn.setSeconds(+(this.tokenExpiresIn.getSeconds()) + json.expires_in);
-          return this.authToken;
-        })
-        .finally(() => {
-          this.authTokenPromise = null;
+      // Current Auth token is expired, refresh it
+      this.authTokenPromise = this.refreshAccessToken().finally(() => {
+        this.authTokenPromise = null;
       });
       return this.authTokenPromise;
     } else {
-      // refresh not needed, return current auth token
-      return new Promise((successCallback) => {
-        successCallback(this.authToken);
-      });
+      // Refresh not needed, return current auth token
+      return Promise.resolve(this.authToken);
     }
   }
 
+  public async refreshAccessToken(): Promise<string> {
+    const response = await fetch('https://api.myfox.me/oauth/v2/token', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: new URLSearchParams({
+        grant_type: 'refresh_token',
+        client_id: this.config.myfoxAPI.clientId,
+        client_secret: this.config.myfoxAPI.clientSecret,
+        refresh_token: this.config.myfoxAPI.refreshToken,
+      }),
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(`Failed to refresh access token: ${data.error_description}`);
+    }
+
+    this.authToken = data.access_token;
+    this.config.myfoxAPI.refreshToken = data.refresh_token; // Update the refresh token if it has changed
+    this.tokenExpiresIn = new Date();
+    this.tokenExpiresIn.setSeconds(this.tokenExpiresIn.getSeconds() + data.expires_in);
+    return this.authToken;
+  }
 
   /***
    * Alarm

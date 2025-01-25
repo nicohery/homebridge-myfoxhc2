@@ -21,6 +21,18 @@
             "type": "string",
             "required": true
           },
+          "username": {
+            "title": "Username",
+            "description": "Your Myfox account username",
+            "type": "string",
+            "required": true
+          },
+          "password": {
+            "title": "Password",
+            "description": "Your Myfox account password",
+            "type": "string",
+            "required": true
+          },
           "refreshToken": {
             "title": "Initial refresh token",
             "description": "Check https://api.myfox.me/dev/authentication, paragraph 'Get a Token'",
