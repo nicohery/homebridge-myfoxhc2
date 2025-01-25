@@ -1,16 +1,16 @@
 {
-  "private": true,
+  "private": false,
   "displayName": "Homebridge Myfox HC2 Plugin",
-  "name": "homebridge-myfoxhc2",
+  "name": "@nicohery/homebridge-myfoxhc2",
   "version": "1.4.3",
   "description": "Interact with Myfox HC2 alarm.",
   "license": "ISC",
   "repository": {
     "type": "git",
-    "url": "git://github.com/Jorire/homebridge-myfoxhc2.git"
+    "url": "git://github.com/nicohery/homebridge-myfoxhc2.git"
   },
   "bugs": {
-    "url": "https://github.com/Jorire/homebridge-myfoxhc2/issues"
+    "url": "https://github.com/nicohery/homebridge-myfoxhc2/issues"
   },
   "engines": {
     "node": ">=10.17.0",
@@ -31,6 +31,7 @@
   "dependencies": {
     "@types/node-cron": "^2.0.3",
     "@types/node-fetch": "^2.5.7",
+    "axios": "^1.7.9",
     "node-cron": "^2.0.3",
     "node-fetch": "^2.6.1"
   },
@@ -39,10 +40,12 @@
     "@typescript-eslint/eslint-plugin": "^2.29.0",
     "@typescript-eslint/parser": "^2.29.0",
     "eslint": "^6.8.0",
+    "homebridge": "^0.4.54-beta.54",
     "nodemon": "^2.0.3",
     "rimraf": "^3.0.2",
     "ts-node": "^8.9.0",
-    "typescript": "^3.8.3",
-    "homebridge": "^0.4.54-beta.54"
-  }
+    "typescript": "^3.8.3"
+  },
+  "homepage": "https://github.com/nicohery/homebridge-myfoxhc2#readme",
+  "author": "nicohery"
 }
